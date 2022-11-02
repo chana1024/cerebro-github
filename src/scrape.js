@@ -2,7 +2,8 @@ const request = require('superagent');
 const cheerio = require('cheerio');
 
 const BASE_URL = 'https://github.com';
-
+const axios = require('axios').default;
+  
 const scrapeGitHubTrendingUsers = (path = '', query = {since: 'today'}) => {
     let url = `${BASE_URL}/trending/developers/${path}`;
 
@@ -106,19 +107,17 @@ const scrapeGithubUsers = (query = {type: 'Users'}) => {
 
 const scrapeGithubRepos = (path = 'search', query = {type: 'Repositories'}) => {
     let url = `${BASE_URL}/${path}`;
-
-    return request
-        .get(url)
-        .query(query)
+    console.log(url);
+    return axios.get(url+"?q="+query.q)
         .then(res => {
-            let $ = cheerio.load(res.text);
+            let $ = cheerio.load(res.data);
+            console.log($);
             let records = [];
-
-            $('div.repo-list-item').each(function() {
+            $('li.repo-list-item').each(function() {
                 let data = $(this);
                 let record = {};
 
-                let name = data.children().children().children().attr('href');
+                let name = data.find('.v-align-middle').attr('href');
                 let color = data.children().find('span.repo-language-color');
                 let updated =  data.children().find('relative-time').text().trim();
 
@@ -133,7 +132,7 @@ const scrapeGithubRepos = (path = 'search', query = {type: 'Repositories'}) => {
 
                 records.push(record);
             })
-
+            console.log(records);
             return records;
         });
 };
