@@ -107,11 +107,9 @@ const scrapeGithubUsers = (query = {type: 'Users'}) => {
 
 const scrapeGithubRepos = (path = 'search', query = {type: 'Repositories'}) => {
     let url = `${BASE_URL}/${path}`;
-    console.log(url);
     return axios.get(url+"?q="+query.q)
         .then(res => {
             let $ = cheerio.load(res.data);
-            console.log($);
             let records = [];
             $('li.repo-list-item').each(function() {
                 let data = $(this);
